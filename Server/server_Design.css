@@ -1,0 +1,153 @@
+/* 서버 컨테이너 */
+#server {
+  border: 1px solid #000;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px; /* 모서리 둥글게 */
+  background-color: #f4f4f4; /* 배경 색 */
+  text-align: center; /* 전체 텍스트 중앙 정렬 */
+}
+
+/* 메뉴 목록을 표처럼 보이게 하기 */
+#menu-list {
+  margin-top: 20px;
+  display: table;
+  width: 100%;
+  border-collapse: collapse; /* 테이블 안에 경계가 겹치지 않게 */
+}
+
+#menu-list div {
+  display: table-row;
+}
+
+#menu-list div > div {
+  display: table-cell;
+  padding: 10px;
+  text-align: center; /* 메뉴 항목들을 가운데 정렬 */
+  border: 1px solid #ddd; /* 테두리 설정 */
+  word-wrap: break-word; /* 긴 텍스트가 잘리지 않게 */
+  white-space: normal; /* 공백 처리 */
+  table-layout: auto; /* 텍스트 크기에 맞게 칸 크기 조정 */
+}
+
+/* 공통 팝업 스타일 */
+.popup {
+  display: none; /* 팝업은 기본적으로 보이지 않도록 설정 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* 다른 요소들 위에 표시되도록 z-index 추가 */
+}
+
+/* 메뉴 추가 팝업 내용 스타일 */
+#add-popup-content,
+#update-popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px; /* 모서리 둥글게 */
+  text-align: center;
+  width: 400px; /* 팝업 너비 설정 */
+  max-width: 90%; /* 반응형 디자인을 위한 최대 너비 설정 */
+  min-height: 200px; /* 최소 높이 설정 */
+}
+
+/* 메뉴 이름, 가격 입력 필드 스타일 */
+input[type="text"], input[type="number"], input[type="file"] {
+  width: 80%;  /* 너비를 80%로 줄임 */
+  max-width: 300px;  /* 최대 너비를 300px로 제한 */
+  margin: 5px 0;  /* 위아래 간격 */
+  padding: 8px;
+  text-align: center;  /* 텍스트 가운데 정렬 */
+}
+
+/* 버튼 스타일 */
+button {
+  background-color: #ffcc80; /* 연한 주황색 배경 */
+  color: white; /* 텍스트 색 */
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 5px; /* 버튼 모서리 둥글게 */
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #ffb74d; /* 버튼 hover 시 색상 변경 */
+}
+
+/* 메뉴 목록을 표처럼 보이게 하기 */
+#menu-list {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+#menu-list div {
+  display: table-row;
+}
+
+#menu-list div > div {
+  display: table-cell;
+  padding: 15px;
+  border: 1px solid #ddd;
+  text-align: center;
+  vertical-align: middle;
+  word-wrap: break-word; /* 긴 텍스트가 잘리지 않게 */
+  white-space: normal; /* 공백 처리 */
+}
+
+/* 메뉴 목록 제목 스타일 */
+#menu-list div > div:first-child {
+  font-weight: bold;
+}
+
+/* 메뉴 항목 스타일 */
+#menu-list div > div img {
+  width: 80px; /* 이미지 크기 조정 */
+  height: auto;
+  margin: 5px 0;
+}
+
+#menu-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#menu-table th, #menu-table td {
+  border: 1px solid black;  /* 검은색 테두리 추가 */
+  padding: 10px;
+  text-align: center;  /* 텍스트 가운데 정렬 */
+  word-wrap: break-word; /* 긴 텍스트가 잘리지 않게 */
+  white-space: normal; /* 공백 처리 */
+}
+
+#menu-table th {
+  background-color: #f2f2f2;  /* 헤더 배경 색상 */
+}
+
+#menu-table td button {
+  background-color: #f8b400;  /* 버튼 배경 색상 */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+#menu-table td button:hover {
+  background-color: #e89c00;  /* 버튼 호버 색상 */
+}
+
+#menu-category {
+  width: 80%;
+  max-width: 300px;
+  margin: 5px 0;
+  padding: 8px;
+  text-align: center;
+}

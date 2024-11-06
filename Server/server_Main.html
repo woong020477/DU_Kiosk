@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메뉴 관리</title>
+    <link rel="stylesheet" href="server_Design.css">
+</head>
+<body>
+    <h1>메뉴 관리 시스템</h1>
+
+    <!-- 메뉴 목록 표시 -->
+    <div id="menu-list">
+        <table id="menu-table">
+            <thead>
+                <tr>
+                    <th>ID</th> <!-- ID 열 추가 -->
+                    <th>카테고리</th>
+                    <th>메뉴명</th>
+                    <th>가격</th>
+                    <th>이미지</th>
+                    <th>수정</th>
+                    <th>삭제</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 메뉴 항목은 여기에 동적으로 추가됩니다 -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 메뉴 추가 팝업 -->
+    <div id="add-form" class="popup">
+        <div id="add-popup-content">
+            <h2>메뉴 추가</h2>
+            <label>카테고리: <input type="text" id="menu-category"></label><br>
+            <label>메뉴명: <input type="text" id="menu-name"></label><br>
+            <label>가격: <input type="number" id="menu-price"></label><br>
+            <label>이미지: <input type="file" id="menu-image"></label><br>
+            <button onclick="addMenu()">추가</button>
+            <button onclick="closeAddMenuForm()">취소</button>
+        </div>
+    </div>
+
+    <!-- 메뉴 수정 팝업 -->
+    <div id="update-form" class="popup">
+        <div id="update-popup-content">
+          <h2>메뉴 수정</h2>
+          <label>ID: <input type="text" id="update-menu-id"></label><br>  <!-- 수정할 메뉴의 id -->
+          <label>카테고리: <input type="text" id="update-menu-category"></label><br>
+          <label>메뉴명: <input type="text" id="update-menu-name"></label><br>
+          <label>가격: <input type="number" id="update-menu-price"></label><br>
+          <label>이미지: <input type="file" id="update-menu-image"></label><br>
+          <button onclick="updateMenu()">수정</button>
+          <button onclick="closeUpdateMenuForm()">취소</button>
+        </div>
+    </div>
+
+    <button onclick="showAddMenuForm()">메뉴 추가</button>
+
+    <script>
+        // 메뉴 데이터를 서버에서 가져오는 함수
+        function fetchMenu() {
+            fetch('http://localhost:8000/menu')
+                .then(response => response.json())
+                .then(data => {
+                    const menuContainer = document.getElementById('menu-table').getElementsByTagName('tbody')[0];
+                    menuContainer.innerHTML = '';  // 기존 메뉴 초기화
+
+                    data.forEach(item => {
+                        const safeName = item.name.replace(/'/g, "\\'");  // '를 이스케이프 처리
+                        const safeCategory = item.category.replace(/'/g, "\\'");  // '를 이스케이프 처리
+                        const safeImage = item.image || ''; // 이미지가 없으면 빈 문자열
+
+                        const menuRow = document.createElement('tr');
+                        menuRow.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.category}</td>
+                            <td>${item.name}</td>
+                            <td>${item.price}원</td>
+                            <td>${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100px; height:auto;">` : ''}</td>
+                            <td><button onclick="prepareUpdateMenu(${item.id}, '${safeName}', ${item.price}, '${safeImage}', '${safeCategory}')">수정</button></td>
+                            <td><button onclick="deleteMenu(${item.id})">삭제</button></td>
+                        `;
+                        menuContainer.appendChild(menuRow);
+                    });
+                })
+                .catch(error => {
+                    alert('메뉴를 불러오는 데 실패했습니다: ' + error);
+                });
+        }
+
+        // 메뉴 추가 요청
+        function addMenu() {
+            const category = document.getElementById('menu-category').value;
+            const name = document.getElementById('menu-name').value;
+            const price = document.getElementById('menu-price').value;
+            const imageInput = document.getElementById('menu-image');
+            const imageFile = imageInput.files[0];
+
+            let formData = new FormData();
+            formData.append('category', category);
+            formData.append('name', name);
+            formData.append('price', price);
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+
+            fetch('http://localhost:8000/menu', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('메뉴가 추가되었습니다!');
+                fetchMenu();  // 메뉴 갱신
+                closeAddMenuForm();  // 추가 양식 숨기기
+            })
+            .catch(error => {
+                alert('메뉴 추가에 실패했습니다: ' + error);
+            });
+        }
+
+        // 메뉴 수정 준비
+        function prepareUpdateMenu(id, name, price, image, category) {
+            document.getElementById('update-menu-id').value = id;
+            document.getElementById('update-menu-category').value = category;
+            document.getElementById('update-menu-name').value = name;
+            document.getElementById('update-menu-price').value = price;
+            document.getElementById('update-menu-image').value = '';  // 기존 이미지는 변경하지 않음
+
+            showUpdateMenuForm(id);  // 메뉴 수정 폼을 보여줌
+        }
+
+        // 메뉴 수정 폼 보이기
+        function showUpdateMenuForm(id) {
+            const updateForm = document.getElementById('update-form');
+            updateForm.style.display = 'flex';  // 메뉴 수정 팝업 보이기
+
+            const addForm = document.getElementById('add-form');
+            addForm.style.display = 'none';  // 메뉴 추가 팝업 숨기기
+        }
+
+        // 수정된 메뉴 저장
+        function updateMenu() {
+            const id = document.getElementById('update-menu-id').value;
+            const category = document.getElementById('update-menu-category').value;
+            const name = document.getElementById('update-menu-name').value;
+            const price = document.getElementById('update-menu-price').value;
+            const imageInput = document.getElementById('update-menu-image');
+            const imageFile = imageInput.files[0];
+
+            let update_FormData = new FormData();
+            update_FormData.append('id', id);
+            update_FormData.append('category', category);
+            update_FormData.append('name', name);
+            update_FormData.append('price', price);
+            if (imageFile) {
+              update_FormData.append('image', imageFile);
+            }
+
+            // 서버로 수정된 메뉴 전송
+            fetch('http://localhost:8000/menu/update', {
+                method: 'POST',
+                body: update_FormData // 수정된 변수명을 사용
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('메뉴가 수정되었습니다!');
+                fetchMenu();  // 메뉴 목록 갱신
+                closeUpdateMenuForm();  // 수정 폼 닫기
+            })
+            .catch(error => {
+                alert('메뉴 수정에 실패했습니다: ' + error);
+            });
+        }
+
+        // 수정 양식 초기화
+        function closeUpdateMenuForm() {
+            const updateForm = document.getElementById('update-form');
+            updateForm.style.display = 'none';  // 메뉴 수정 팝업 숨기기
+        }
+
+        // 메뉴 삭제 요청
+        function deleteMenu(id) {
+            const menuToDelete = { id };
+
+            fetch('http://localhost:8000/menu', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(menuToDelete)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchMenu();  // 메뉴 갱신
+            })
+            .catch(error => {
+                alert('메뉴 삭제에 실패했습니다: ' + error);
+            });
+        }
+
+        // 메뉴 추가 팝업 보이기
+        function showAddMenuForm() {
+            const addForm = document.getElementById('add-form');
+            addForm.style.display = 'flex';  // 메뉴 추가 팝업 보이기
+
+            const updateForm = document.getElementById('update-form');
+            updateForm.style.display = 'none';  // 메뉴 수정 팝업 숨기기
+        }
+
+        // 페이지 로드 시 메뉴 목록 가져오기
+        window.onload = fetchMenu;
+    </script>
+</body>
+</html>
