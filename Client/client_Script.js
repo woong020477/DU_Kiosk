@@ -53,12 +53,14 @@ function showAddItemPopup(menuId) {
         return;
     }
 
-    // 팝업에 메뉴 이름과 가격 업데이트
+    // 팝업에 메뉴 ID, 이름, 가격 업데이트
+    const popupId = document.getElementById('popup-item-id');
     const popupName = document.getElementById('popup-item-name');
     const popupPrice = document.getElementById('popup-item-price');
     const extraCheckbox = document.getElementById('extra');
     const removeTextInput = document.getElementById('remove-text');
 
+    popupId.textContent = menuId;  // 메뉴 ID 설정
     popupName.textContent = menuItem.name;  // 메뉴 이름 설정
     popupPrice.textContent = `${menuItem.price}원`;  // 가격 설정
 
@@ -79,7 +81,8 @@ function closeAddItemPopup() {
 
 // 장바구니에 아이템을 추가하는 함수
 function addToCart() {
-    const menuId = document.getElementById('popup-item-name').textContent;  // 메뉴 ID는 이름으로 처리하면 안됨, 서버에서 받아오게 수정 필요
+    // 팝업에 설정된 menuId를 가져오기
+    const menuId = parseInt(document.getElementById('popup-item-id').textContent);
     const menuName = document.getElementById('popup-item-name').textContent;
     const menuPrice = parseInt(document.getElementById('popup-item-price').textContent.replace('원', ''));
 

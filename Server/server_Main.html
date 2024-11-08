@@ -65,21 +65,21 @@
     <!-- 메뉴 수정 팝업 -->
     <div id="update-form" class="popup">
         <div id="update-popup-content">
-          <h2>메뉴 수정</h2>
-          <label>ID: <input type="text" id="update-menu-id" readonly/></label><br>
-          <label>카테고리: 
-                <select id="update-menu-category">
-                    <option value="한식">한식</option>
-                    <option value="분식">분식</option>
-                    <option value="양식">양식</option>
-                    <option value="Special">Special</option>
-                </select>
-            </label><br>
-          <label>메뉴명: <input type="text" id="update-menu-name"></label><br>
-          <label>가격: <input type="number" id="update-menu-price"></label><br>
-          <label>이미지: <input type="file" id="update-menu-image"></label><br>
-          <button onclick="updateMenu()">수정</button>
-          <button onclick="closeUpdateMenuForm()">취소</button>
+            <h2>메뉴 수정</h2>
+            <label>ID: <input type="text" id="update-menu-id" readonly/></label><br>
+            <label>카테고리: 
+                  <select id="update-menu-category">
+                      <option value="한식">한식</option>
+                      <option value="분식">분식</option>
+                      <option value="양식">양식</option>
+                      <option value="Special">Special</option>
+                  </select>
+              </label><br>
+            <label>메뉴명: <input type="text" id="update-menu-name"></label><br>
+            <label>가격: <input type="number" id="update-menu-price"></label><br>
+            <label>이미지: <input type="file" id="update-menu-image"></label><br>
+            <button onclick="updateMenu()">수정</button>
+            <button onclick="closeUpdateMenuForm()">취소</button>
         </div>
     </div>
 
@@ -278,7 +278,7 @@
 
         // 메뉴 추가 폼을 표시
         function showAddMenuForm() {
-            document.getElementById('add-form').style.display = 'block';  // 추가 폼을 표시
+            document.getElementById('add-form').style.display = 'flex';  // 추가 폼을 표시
         }
 
         // 메뉴 추가 폼을 숨기기
@@ -288,7 +288,7 @@
 
         // 메뉴 수정 폼을 표시
         function showUpdateMenuForm() {
-            document.getElementById('update-form').style.display = 'block';  // 수정 폼을 표시
+            document.getElementById('update-form').style.display = 'flex';  // 수정 폼을 표시
         }
 
         // 메뉴 수정 폼을 숨기기
