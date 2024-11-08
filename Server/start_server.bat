@@ -1,49 +1,49 @@
 @echo off
-:: UTF-8 ì¸ì½”ë”© ì„¤ì •
-chcp 65001
 
-:: í•´ë‹¹ ë””ë ‰í† ë¦¬ë¡œ ì´ë™
-echo ì´ë™ ì¤‘: %USERPROFILE%\Documents\GitHub\DU_Kiosk\Server ë””ë ‰í† ë¦¬ë¡œ ì´ë™í•©ë‹ˆë‹¤...
+:: ÇØ´ç µğ·ºÅä¸®·Î ÀÌµ¿
 cd /d %USERPROFILE%\Documents\GitHub\DU_Kiosk\Server
 echo.
 
-:: package.json íŒŒì¼ ì¡´ì¬ ì—¬ë¶€ í™•ì¸
-if exist package.json (
-    echo package.json íŒŒì¼ì´ ì´ë¯¸ ì¡´ì¬í•©ë‹ˆë‹¤. npm init -yë¥¼ ê±´ë„ˆëœë‹ˆë‹¤...
-) else (
-    echo npm init -y ëª…ë ¹ì–´ ì‹¤í–‰ ì¤‘...
+:: package.json ÆÄÀÏ Á¸Àç ¿©ºÎ È®ÀÎ
+if not exist package.json (
+    echo package.json ÆÄÀÏÀÌ ¾ø½À´Ï´Ù. npm init -y ¸í·É¾î ½ÇÇà Áß...
     npm init -y
+    cmd/k start_server.bat
 )
 
-:: express, multer, cors ëª¨ë“ˆ ì„¤ì¹˜ ì—¬ë¶€ í™•ì¸
+:: express ¸ğµâ ¼³Ä¡ ¿©ºÎ È®ÀÎ
 if not exist node_modules\express (
-    echo express ëª¨ë“ˆì´ ì„¤ì¹˜ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. ì„¤ì¹˜ ì¤‘...
+    echo express ¸ğµâÀÌ ¼³Ä¡µÇÁö ¾Ê¾Ò½À´Ï´Ù. ¼³Ä¡ Áß...
     npm install express
-) else (
-    echo express ëª¨ë“ˆì´ ì´ë¯¸ ì„¤ì¹˜ë˜ì–´ ìˆìŠµë‹ˆë‹¤.
+    cmd/k start_server.bat
 )
 
+:: multer ¸ğµâ ¼³Ä¡ ¿©ºÎ È®ÀÎ
 if not exist node_modules\multer (
-    echo multer ëª¨ë“ˆì´ ì„¤ì¹˜ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. ì„¤ì¹˜ ì¤‘...
+    echo multer ¸ğµâÀÌ ¼³Ä¡µÇÁö ¾Ê¾Ò½À´Ï´Ù. ¼³Ä¡ Áß...
     npm install multer
-) else (
-    echo multer ëª¨ë“ˆì´ ì´ë¯¸ ì„¤ì¹˜ë˜ì–´ ìˆìŠµë‹ˆë‹¤.
+    cmd/k start_server.bat
 )
 
+:: cors ¸ğµâ ¼³Ä¡ ¿©ºÎ È®ÀÎ
 if not exist node_modules\cors (
-    echo cors ëª¨ë“ˆì´ ì„¤ì¹˜ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. ì„¤ì¹˜ ì¤‘...
+    echo cors ¸ğµâÀÌ ¼³Ä¡µÇÁö ¾Ê¾Ò½À´Ï´Ù. ¼³Ä¡ Áß...
     npm install cors
-) else (
-    echo cors ëª¨ë“ˆì´ ì´ë¯¸ ì„¤ì¹˜ë˜ì–´ ìˆìŠµë‹ˆë‹¤.
+    cmd/k start_server.bat
 )
 
-:: server_Main.html íŒŒì¼ ì›¹ ë¸Œë¼ìš°ì €ë¡œ ì‹¤í–‰
-echo server_Main.htmlì„ ê¸°ë³¸ ì›¹ ë¸Œë¼ìš°ì €ë¡œ ì—½ë‹ˆë‹¤...
+:: ¸ğµç ÆÄÀÏ ¹× ¸ğµâ ¼³Ä¡ ¿Ï·á ÈÄ ´ÙÀ½ ÀÛ¾÷ ÁøÇà
+echo.
+echo ¸ğµç ÆĞÅ°Áö¿Í ¸ğµâÀÌ ÁØºñµÇ¾ú½À´Ï´Ù.
+echo.
+
+:: server_Main.html ÆÄÀÏ À¥ ºê¶ó¿ìÀú·Î ½ÇÇà
+echo server_Main.htmlÀ» ±âº» À¥ ºê¶ó¿ìÀú·Î ¿±´Ï´Ù...
 start "" "%USERPROFILE%\Documents\GitHub\DU_Kiosk\Server\server_Main.html"
 
-:: ì„œë²„ ì‹¤í–‰
+:: ¼­¹ö ½ÇÇà
 echo.
-echo node server.js ì‹¤í–‰ ì¤‘... (ì¢…ë£Œë¥¼ ì›í•˜ë©´ Ctrl + C)
+echo node server.js ½ÇÇà Áß... (Á¾·á¸¦ ¿øÇÏ¸é Ctrl + C)
 node server.js
 echo.
 pause

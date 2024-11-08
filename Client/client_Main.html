@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메뉴 관리</title>
+    <link rel="stylesheet" href="client_Design.css">
+</head>
+<body>
+    <h1>메뉴 관리 시스템</h1>
+
+    <!-- 카테고리 필터 -->
+    <div id="category-filter">
+        <button onclick="filterMenu('전체')">전체</button>
+        <button onclick="filterMenu('한식')">한식</button>
+        <button onclick="filterMenu('양식')">양식</button>
+        <button onclick="filterMenu('분식')">분식</button>
+        <button onclick="filterMenu('Special')">Special</button>
+    </div>
+
+    <!-- 메뉴 목록 -->
+    <div id="menu-list" class="menu-list">
+        <!-- 메뉴 카드가 동적으로 여기에 추가됩니다 -->
+    </div>
+
+    <!-- 장바구니 -->
+    <div id="cart-box" class="cart-box">
+        <p>장바구니: <span id="cart-count">0</span>개</p>
+        <button onclick="showCart()" id="cart-view-button">장바구니 보기</button>
+    </div>
+
+    <!-- 장바구니 팝업 -->
+    <div id="cart-popup" class="popup">
+        <div class="popup-content">
+            <h2>장바구니</h2>
+            <div id="cart-items"></div>  <!-- 장바구니 항목을 표시할 영역 -->
+            <button onclick="checkout()">결제하기</button>
+            <button onclick="closeCartPopup()">닫기</button>
+        </div>
+    </div>
+
+    <!-- 메뉴 추가 팝업 -->
+    <div id="add-item-popup" class="popup" style="display: none;">
+        <div class="popup-content">
+            <h2 id="popup-item-name">메뉴 이름</h2>
+            <p id="popup-item-price">가격</p>
+            <label>
+                곱빼기:
+                <input type="checkbox" id="extra" />
+            </label><br>
+            <label>
+                빼주세요:
+                <input type="text" id="remove-text" />
+            </label><br>
+            <button onclick="addToCart()">담기</button>
+            <button onclick="closeAddItemPopup()">취소</button>
+        </div>
+    </div>
+
+    <script src="client_Script.js"></script>
+</body>
+</html>

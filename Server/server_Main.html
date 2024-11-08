@@ -8,21 +8,34 @@
 </head>
 <body>
     <h1>메뉴 관리 시스템</h1>
-
+    <!-- 메뉴 추가 버튼 -->
+    <button onclick="showAddMenuForm()">메뉴 추가</button>
     <!-- 메뉴 목록 표시 -->
     <div id="menu-list">
         <table id="menu-table">
             <thead>
                 <tr>
-                    <th>ID</th> <!-- ID 열 추가 -->
-                    <th>카테고리</th>
+                    <th>
+                        <button onclick="sortMenu('id')">ID</button> <!-- ID 정렬 가능 -->
+                    </th>
+                    <th>
+                        <select id="category-filter" onchange="filterByCategory()">
+                            <option value="">카테고리</option>
+                            <option value="한식">한식</option>
+                            <option value="분식">분식</option>
+                            <option value="양식">양식</option>
+                            <option value="Special">Special</option>
+                        </select>
+                    </th>
                     <th>메뉴명</th>
-                    <th>가격</th>
+                    <th>
+                        <button onclick="sortMenu('price')">가격</button> <!-- 가격 정렬 가능 -->
+                    </th>
                     <th>이미지</th>
                     <th>수정</th>
                     <th>삭제</th>
                 </tr>
-            </thead>
+            </thead>            
             <tbody>
                 <!-- 메뉴 항목은 여기에 동적으로 추가됩니다 -->
             </tbody>
@@ -33,7 +46,14 @@
     <div id="add-form" class="popup">
         <div id="add-popup-content">
             <h2>메뉴 추가</h2>
-            <label>카테고리: <input type="text" id="menu-category"></label><br>
+            <label>카테고리: 
+                <select id="menu-category">
+                    <option value="한식">한식</option>
+                    <option value="분식">분식</option>
+                    <option value="양식">양식</option>
+                    <option value="Special">Special</option>
+                </select>
+            </label><br>
             <label>메뉴명: <input type="text" id="menu-name"></label><br>
             <label>가격: <input type="number" id="menu-price"></label><br>
             <label>이미지: <input type="file" id="menu-image"></label><br>
@@ -46,8 +66,15 @@
     <div id="update-form" class="popup">
         <div id="update-popup-content">
           <h2>메뉴 수정</h2>
-          <label>ID: <input type="text" id="update-menu-id"></label><br>  <!-- 수정할 메뉴의 id -->
-          <label>카테고리: <input type="text" id="update-menu-category"></label><br>
+          <label>ID: <input type="text" id="update-menu-id" readonly/></label><br>
+          <label>카테고리: 
+                <select id="update-menu-category">
+                    <option value="한식">한식</option>
+                    <option value="분식">분식</option>
+                    <option value="양식">양식</option>
+                    <option value="Special">Special</option>
+                </select>
+            </label><br>
           <label>메뉴명: <input type="text" id="update-menu-name"></label><br>
           <label>가격: <input type="number" id="update-menu-price"></label><br>
           <label>이미지: <input type="file" id="update-menu-image"></label><br>
@@ -56,157 +83,217 @@
         </div>
     </div>
 
-    <button onclick="showAddMenuForm()">메뉴 추가</button>
-
     <script>
+        let currentSortColumn = '';
+        let currentSortOrder = 'asc';
+
         // 메뉴 데이터를 서버에서 가져오는 함수
         function fetchMenu() {
             fetch('http://localhost:8000/menu')
                 .then(response => response.json())
                 .then(data => {
-                    const menuContainer = document.getElementById('menu-table').getElementsByTagName('tbody')[0];
-                    menuContainer.innerHTML = '';  // 기존 메뉴 초기화
-
-                    data.forEach(item => {
-                        const safeName = item.name.replace(/'/g, "\\'");  // '를 이스케이프 처리
-                        const safeCategory = item.category.replace(/'/g, "\\'");  // '를 이스케이프 처리
-                        const safeImage = item.image || ''; // 이미지가 없으면 빈 문자열
-
-                        const menuRow = document.createElement('tr');
-                        menuRow.innerHTML = `
-                            <td>${item.id}</td>
-                            <td>${item.category}</td>
-                            <td>${item.name}</td>
-                            <td>${item.price}원</td>
-                            <td>${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100px; height:auto;">` : ''}</td>
-                            <td><button onclick="prepareUpdateMenu(${item.id}, '${safeName}', ${item.price}, '${safeImage}', '${safeCategory}')">수정</button></td>
-                            <td><button onclick="deleteMenu(${item.id})">삭제</button></td>
-                        `;
-                        menuContainer.appendChild(menuRow);
-                    });
+                    displayMenu(data);
                 })
                 .catch(error => {
                     alert('메뉴를 불러오는 데 실패했습니다: ' + error);
                 });
         }
 
-        // 메뉴 추가 요청
+        // 메뉴 데이터 표시 및 정렬/필터링
+        function displayMenu(data) {
+            const categoryFilter = document.getElementById('category-filter').value;
+            const menuContainer = document.getElementById('menu-table').getElementsByTagName('tbody')[0];
+            menuContainer.innerHTML = '';
+
+            data = data.filter(item => categoryFilter === '전체' || categoryFilter === '' || item.category === categoryFilter);
+
+            if (currentSortColumn) {
+                data.sort((a, b) => {
+                    let valueA = a[currentSortColumn];
+                    let valueB = b[currentSortColumn];
+                    if (currentSortColumn === 'price' || currentSortColumn === 'id') {
+                        valueA = parseFloat(valueA);
+                        valueB = parseFloat(valueB);
+                    }
+                    if (currentSortOrder === 'asc') return valueA > valueB ? 1 : -1;
+                    else return valueA < valueB ? 1 : -1;
+                });
+            }
+
+            data.forEach(item => {
+                const safeName = item.name.replace(/'/g, "\\'");
+                const safeCategory = item.category.replace(/'/g, "\\'");
+                const safeImage = item.image || '';
+                const menuRow = document.createElement('tr');
+                menuRow.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.category}</td>
+                    <td>${item.name}</td>
+                    <td>${item.price}원</td>
+                    <td>${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100px; height:auto;">` : ''}</td>
+                    <td><button onclick="prepareUpdateMenu(${item.id}, '${safeName}', ${item.price}, '${safeImage}', '${safeCategory}')">수정</button></td>
+                    <td><button onclick="deleteMenu(${item.id})">삭제</button></td>
+                `;
+                menuContainer.appendChild(menuRow);
+            });
+        }
+
+        function filterByCategory() {
+            fetchMenu();
+        }
+
+        function sortMenu(column) {
+            if (currentSortColumn !== column) {
+                // 새 열을 선택하면 오름차순으로 시작
+                currentSortOrder = 'asc';
+            } else {
+                // 같은 열을 다시 클릭하면 정렬 방향을 변경
+                currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+            }
+            currentSortColumn = column;
+            fetchMenu();
+        }
+
+        // 메뉴 추가 함수
         function addMenu() {
+            // 입력된 값 가져오기
             const category = document.getElementById('menu-category').value;
             const name = document.getElementById('menu-name').value;
             const price = document.getElementById('menu-price').value;
-            const imageInput = document.getElementById('menu-image');
-            const imageFile = imageInput.files[0];
+            const image = document.getElementById('menu-image').files[0]; // 이미지 파일
 
-            let formData = new FormData();
+            // 필수 입력 값 체크
+            if (!category || !name || !price) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+
+            // 폼 데이터 구성 (이미지 파일 포함)
+            const formData = new FormData();
             formData.append('category', category);
             formData.append('name', name);
             formData.append('price', price);
-            if (imageFile) {
-                formData.append('image', imageFile);
+            if (image) {
+                formData.append('image', image);
             }
 
+            // 서버로 메뉴 추가 요청 보내기
             fetch('http://localhost:8000/menu', {
                 method: 'POST',
-                body: formData
+                body: formData // FormData는 자동으로 적절한 Content-Type을 설정합니다.
             })
             .then(response => response.json())
             .then(data => {
-                alert('메뉴가 추가되었습니다!');
-                fetchMenu();  // 메뉴 갱신
-                closeAddMenuForm();  // 추가 양식 숨기기
+                if (data.id) {
+                    alert('메뉴가 성공적으로 추가되었습니다.');
+                    closeAddMenuForm();  // 추가 폼 닫기
+                    fetchMenu();  // 메뉴 목록 다시 불러오기
+                } else {
+                    alert('메뉴 추가에 실패했습니다.');
+                }
             })
             .catch(error => {
-                alert('메뉴 추가에 실패했습니다: ' + error);
+                alert('메뉴 추가 중 오류가 발생했습니다: ' + error);
             });
         }
 
-        // 메뉴 수정 준비
+        // 수정할 메뉴를 준비하는 함수
         function prepareUpdateMenu(id, name, price, image, category) {
+            // 수정 폼의 각 필드에 기존 값들을 넣음
             document.getElementById('update-menu-id').value = id;
-            document.getElementById('update-menu-category').value = category;
             document.getElementById('update-menu-name').value = name;
             document.getElementById('update-menu-price').value = price;
-            document.getElementById('update-menu-image').value = '';  // 기존 이미지는 변경하지 않음
+            document.getElementById('update-menu-category').value = category;
+            document.getElementById('update-menu-image').value = ''; // 새 이미지는 선택 안함
 
-            showUpdateMenuForm(id);  // 메뉴 수정 폼을 보여줌
+            // 수정 폼 열기
+            showUpdateMenuForm();
         }
 
-        // 메뉴 수정 폼 보이기
-        function showUpdateMenuForm(id) {
-            const updateForm = document.getElementById('update-form');
-            updateForm.style.display = 'flex';  // 메뉴 수정 팝업 보이기
-
-            const addForm = document.getElementById('add-form');
-            addForm.style.display = 'none';  // 메뉴 추가 팝업 숨기기
-        }
-
-        // 수정된 메뉴 저장
+        // 메뉴 수정 함수
         function updateMenu() {
             const id = document.getElementById('update-menu-id').value;
-            const category = document.getElementById('update-menu-category').value;
             const name = document.getElementById('update-menu-name').value;
             const price = document.getElementById('update-menu-price').value;
-            const imageInput = document.getElementById('update-menu-image');
-            const imageFile = imageInput.files[0];
+            const category = document.getElementById('update-menu-category').value;
+            const image = document.getElementById('update-menu-image').files[0]; // 새 이미지 파일
 
-            let update_FormData = new FormData();
-            update_FormData.append('id', id);
-            update_FormData.append('category', category);
-            update_FormData.append('name', name);
-            update_FormData.append('price', price);
-            if (imageFile) {
-              update_FormData.append('image', imageFile);
+            // FormData 객체 생성 (파일을 포함한 폼 데이터 전송을 위해)
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('name', name);
+            formData.append('price', price);
+            formData.append('category', category);
+            if (image) {
+                formData.append('image', image);  // 새 이미지가 선택되었을 경우
             }
 
-            // 서버로 수정된 메뉴 전송
+            // 서버에 수정 요청 보내기
             fetch('http://localhost:8000/menu/update', {
                 method: 'POST',
-                body: update_FormData // 수정된 변수명을 사용
+                body: formData  // FormData로 데이터를 전송
             })
             .then(response => response.json())
             .then(data => {
-                alert('메뉴가 수정되었습니다!');
-                fetchMenu();  // 메뉴 목록 갱신
-                closeUpdateMenuForm();  // 수정 폼 닫기
+                if (data.status === 'success') {
+                    alert('메뉴가 수정되었습니다.');
+                    closeUpdateMenuForm();  // 수정 폼 닫기
+                    fetchMenu();  // 메뉴 목록 새로고침
+                } else {
+                    alert('메뉴 수정에 실패했습니다.');
+                }
             })
             .catch(error => {
-                alert('메뉴 수정에 실패했습니다: ' + error);
+                alert('메뉴 수정 중 오류가 발생했습니다: ' + error);
             });
         }
 
-        // 수정 양식 초기화
-        function closeUpdateMenuForm() {
-            const updateForm = document.getElementById('update-form');
-            updateForm.style.display = 'none';  // 메뉴 수정 팝업 숨기기
-        }
-
-        // 메뉴 삭제 요청
+        // 메뉴 삭제 함수
         function deleteMenu(id) {
-            const menuToDelete = { id };
+            if (!confirm('정말로 이 메뉴를 삭제하시겠습니까?')) {
+                return;  // 사용자가 취소한 경우 삭제하지 않음
+            }
 
+            // 삭제할 메뉴의 ID를 서버에 전달하여 삭제 요청
             fetch('http://localhost:8000/menu', {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(menuToDelete)
+                headers: {
+                    'Content-Type': 'application/json',  // JSON 형식으로 요청 본문을 보냄
+                },
+                body: JSON.stringify({ id: id })  // 삭제할 메뉴 ID 포함
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.message);
-                fetchMenu();  // 메뉴 갱신
+                if (data.status === 'success') {
+                    alert('메뉴가 삭제되었습니다.');
+                    fetchMenu();  // 메뉴 목록 새로고침
+                } else {
+                    alert('메뉴 삭제에 실패했습니다.');
+                }
             })
             .catch(error => {
-                alert('메뉴 삭제에 실패했습니다: ' + error);
+                alert('메뉴 삭제 중 오류가 발생했습니다: ' + error);
             });
         }
 
-        // 메뉴 추가 팝업 보이기
+        // 메뉴 추가 폼을 표시
         function showAddMenuForm() {
-            const addForm = document.getElementById('add-form');
-            addForm.style.display = 'flex';  // 메뉴 추가 팝업 보이기
+            document.getElementById('add-form').style.display = 'block';  // 추가 폼을 표시
+        }
 
-            const updateForm = document.getElementById('update-form');
-            updateForm.style.display = 'none';  // 메뉴 수정 팝업 숨기기
+        // 메뉴 추가 폼을 숨기기
+        function closeAddMenuForm() {
+            document.getElementById('add-form').style.display = 'none';  // 추가 폼을 숨기기
+        }
+
+        // 메뉴 수정 폼을 표시
+        function showUpdateMenuForm() {
+            document.getElementById('update-form').style.display = 'block';  // 수정 폼을 표시
+        }
+
+        // 메뉴 수정 폼을 숨기기
+        function closeUpdateMenuForm() {
+            document.getElementById('update-form').style.display = 'none';  // 수정 폼을 숨기기
         }
 
         // 페이지 로드 시 메뉴 목록 가져오기

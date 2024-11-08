@@ -12,10 +12,10 @@ const port = 8000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// 이미지 업로드 설정
 const upload = multer({
-    dest: 'uploads/',  // 업로드된 파일이 저장될 디렉토리
+    dest: 'uploads/',  // 업로드된 파일이 'uploads/' 폴더에 저장됨
     limits: { fileSize: 5 * 1024 * 1024 },  // 파일 크기 제한 (5MB)
     fileFilter: (req, file, cb) => {
         const fileTypes = /jpeg|jpg|png|gif/;
