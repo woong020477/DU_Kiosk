@@ -3,7 +3,7 @@
 chcp 65001 >nul
 
 :: 프로젝트 경로접근 및 짧은 형식으로 변환
-for %%I in ("%USERPROFILE%\Documents\GitHub\DU_Kiosk\Server") do set SHORT_PATH=%%~sI
+for %%I in ("C:\DU_Kiosk\Server") do set SHORT_PATH=%%~sI
 cd /d %SHORT_PATH%
 echo.
 
