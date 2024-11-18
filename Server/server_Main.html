@@ -16,7 +16,7 @@
             <thead>
                 <tr>
                     <th>
-                        <button onclick="sortMenu('id')">ID</button> <!-- ID 정렬 가능 -->
+                        <label onclick="sortMenu('id')">ID</label> <!-- ID 정렬 가능 -->
                     </th>
                     <th>
                         <select id="category-filter" onchange="filterByCategory()">
@@ -29,7 +29,7 @@
                     </th>
                     <th>메뉴명</th>
                     <th>
-                        <button onclick="sortMenu('price')">가격</button> <!-- 가격 정렬 가능 -->
+                        <label onclick="sortMenu('price')">가격</label> <!-- 가격 정렬 가능 -->
                     </th>
                     <th>이미지</th>
                     <th>수정</th>
@@ -57,8 +57,8 @@
             <label>메뉴명: <input type="text" id="menu-name"></label><br>
             <label>가격: <input type="number" id="menu-price"></label><br>
             <label>이미지: <input type="file" id="menu-image"></label><br>
-            <button onclick="addMenu()">추가</button>
-            <button onclick="closeAddMenuForm()">취소</button>
+            <label onclick="addMenu()">추가</button>
+            <label onclick="closeAddMenuForm()">취소</button>
         </div>
     </div>
 
