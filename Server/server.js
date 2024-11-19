@@ -28,7 +28,7 @@ const upload = multer({
     }
 });
 
-// 메뉴 데이터를 저장할 JSON 파일
+// 메뉴 데이터를 보관하는 JSON 파일 경로
 const filePath = 'food_List.json';
 
 // 메뉴 데이터를 읽어오는 함수
@@ -41,10 +41,10 @@ const getMenuData = () => {
 
 // 메뉴 데이터를 저장하는 함수
 const saveMenuData = (menuList) => {
-    // id를 순차적으로 재정렬
+    // ID를 순차적으로 정렬
     menuList = menuList.map((item, index) => ({
         ...item,
-        id: index + 1  // id를 1부터 순차적으로 매핑
+        id: index + 1   // 1부터 순차적으로
     }));
     fs.writeFileSync(filePath, JSON.stringify(menuList, null, 2));  // 수정된 데이터 덮어쓰기
 };
@@ -62,17 +62,51 @@ app.post('/menu', upload.single('image'), (req, res) => {
 
     const menuList = getMenuData();
     const newMenuItem = {
-        id: menuList.length + 1,  // 메뉴 목록 길이에 따라 id를 설정
+        id: menuList.length + 1,
         name,
         price,
         category,
-        image
+        image,
+        soldOut: false, // 초기 품절 상태는 false
     };
 
     menuList.push(newMenuItem);
     saveMenuData(menuList);
 
     res.json(newMenuItem);
+    console.log(`메뉴가 추가되었습니다.`);
+});
+
+// POST: 품절 상태 변경
+app.post('/menu/soldout', (req, res) => {
+    const { id, soldOut } = req.body;
+
+    const menuList = getMenuData();
+    const updatedMenu = menuList.map((item) => {
+        if (item.id === parseInt(id)) {
+            if (soldOut) {
+                // 품절 설정: 원래 이미지를 저장하고 SoldOut 이미지로 교체
+                return {
+                    ...item,
+                    originalImage: item.originalImage || item.image, // 원래 이미지 저장
+                    image: 'uploads/SoldOut_img.png',
+                    soldOut: true,
+                };
+            } else {
+                // 품절 해제: 원래 이미지로 복원
+                return {
+                    ...item,
+                    image: item.originalImage || item.image, // 원래 이미지 복원
+                    soldOut: false,
+                };
+            }
+        }
+        return item;
+    });
+
+    saveMenuData(updatedMenu);
+
+    res.json({ status: 'success', message: '품절 상태가 업데이트되었습니다.' });
 });
 
 // POST: 메뉴 수정
@@ -83,7 +117,6 @@ app.post('/menu/update', upload.single('image'), (req, res) => {
     const menuList = getMenuData();  // 기존 메뉴 목록 읽기
     const updatedMenu = menuList.map((item) => {
         if (item.id === parseInt(id)) {
-            // 해당 id의 메뉴 항목을 수정
             return { ...item, name, price, category, image };
         }
         return item;  // 수정하지 않은 항목은 그대로
@@ -92,20 +125,23 @@ app.post('/menu/update', upload.single('image'), (req, res) => {
     saveMenuData(updatedMenu);  // 수정된 데이터 저장
 
     res.json({ status: 'success', message: '메뉴가 수정되었습니다.' });
+    console.log(`메뉴가 수정되었습니다.`);
 });
 
 // DELETE: 메뉴 삭제
 app.delete('/menu', (req, res) => {
     const { id } = req.body;
+
     const menuList = getMenuData();
-    const updatedMenu = menuList.filter(item => item.id !== parseInt(id));
+    const updatedMenu = menuList.filter((item) => item.id !== parseInt(id));
 
     saveMenuData(updatedMenu);
 
     res.json({ status: 'success', message: '메뉴가 삭제되었습니다.' });
+    console.log(`메뉴가 삭제되었습니다.`);
 });
 
 // 서버 시작
 app.listen(port, () => {
-    console.log(`서버가 http://localhost:${port}에서 실행 중입니다.`);
+    console.log(`서버가 실행 중입니다.`);
 });

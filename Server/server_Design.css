@@ -2,32 +2,19 @@
 #server {
   border: 1px solid #000;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   border-radius: 10px; /* 모서리 둥글게 */
-  background-color: #f4f4f4; /* 배경 색 */
+  background-color: #a4e0c7; /* 배경 색 */
   text-align: center; /* 전체 텍스트 중앙 정렬 */
 }
 
-/* 메뉴 목록을 표처럼 보이게 하기 */
-#menu-list {
-  margin-top: 20px;
-  display: table;
-  width: 100%;
-  border-collapse: collapse; /* 테이블 안에 경계가 겹치지 않게 */
-}
-
-#menu-list div {
-  display: table-row;
-}
-
-#menu-list div > div {
-  display: table-cell;
-  padding: 10px;
-  text-align: center; /* 메뉴 항목들을 가운데 정렬 */
-  border: 1px solid #ddd; /* 테두리 설정 */
-  word-wrap: break-word; /* 긴 텍스트가 잘리지 않게 */
-  white-space: normal; /* 공백 처리 */
-  table-layout: auto; /* 텍스트 크기에 맞게 칸 크기 조정 */
+#server-list {
+  border: 1px solid #000;
+  padding: 20px;
+  margin-bottom: 5px;
+  border-radius: 10px; /* 모서리 둥글게 */
+  background-color: #ece0d5; /* 배경 색 */
+  text-align: left; /* 전체 텍스트 중앙 정렬 */
 }
 
 /* 팝업 배경을 위한 설정 */
@@ -68,7 +55,7 @@ input[type="text"], input[type="number"], input[type="file"]{
 /* 버튼 스타일 */
 button {
   background-color: #ffcc80; /* 연한 주황색 배경 */
-  color: white; /* 텍스트 색 */
+  color: rgba(0, 0, 0, 0.808); /* 텍스트 색 */
   padding: 10px 20px;
   margin: 10px;
   border: none;
@@ -81,11 +68,28 @@ button:hover {
   background-color: #ffb74d; /* 버튼 hover 시 색상 변경 */
 }
 
+/* 전체 레이아웃을 flexbox로 설정하여 메뉴와 주문 테이블을 좌우로 배치 */
+#container {
+  display: flex;
+  flex-direction: row;  /* flex-direction을 row로 설정 */
+  justify-content: space-between;  /* 양쪽 끝으로 배치 */
+  gap: 20px;  /* 메뉴와 주문 리스트 사이 간격 */
+  padding: 20px;
+}
+
+/* 메뉴 목록을 표시할 div (메뉴 테이블) */
+#menu-list, #order-list {
+  width: 48%;  /* 각 테이블의 너비를 48%로 설정 */
+  box-sizing: border-box;  /* 패딩을 포함한 크기 계산 */
+}
+
 /* 메뉴 목록을 표처럼 보이게 하기 */
 #menu-list {
-  width: 100%;
+  width: 70%;
   margin-top: 20px;
   border-collapse: collapse;
+  text-align: left;
+  float: left;
 }
 
 #menu-list div {
@@ -109,15 +113,18 @@ button:hover {
 
 /* 메뉴 항목 스타일 */
 #menu-list div > div img {
-  width: 80px; /* 이미지 크기 조정 */
+  width: 60px; /* 이미지 크기 조정 */
   height: auto;
   margin: 5px 0;
 }
 
+/* 메뉴 테이블 */
 #menu-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  margin-right: 5px;
+  position: relative;
 }
 
 #menu-table th, #menu-table td {
@@ -134,7 +141,7 @@ button:hover {
 
 #menu-table td button {
   background-color: #f8b400;  /* 버튼 배경 색상 */
-  color: white;
+  color: rgba(0, 0, 0, 0.808); /* 텍스트 색 */
   border: none;
   padding: 5px 10px;
   cursor: pointer;
@@ -144,10 +151,34 @@ button:hover {
   background-color: #e89c00;  /* 버튼 호버 색상 */
 }
 
-#menu-category {
-  width: 60%;
-  max-width: 300px;
-  margin: 5px 0;
-  padding: 8px;
+/* 주문 목록을 표처럼 보이게 하기 */
+#order-list {
+  width: 30%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  text-align: left;
+  float: right;
+}
+
+#order-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  margin-left: 5px;
+  position: relative;
+}
+
+#order-table th, #order-table td {
+  padding: 10px;
+  border: 1px solid black;
   text-align: center;
+}
+
+#order-table th {
+  background-color: #f2f2f2;
+}
+
+#order-table td {
+  word-wrap: break-word;
+  white-space: normal;
 }

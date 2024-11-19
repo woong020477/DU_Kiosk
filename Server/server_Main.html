@@ -7,9 +7,12 @@
     <link rel="stylesheet" href="server_Design.css">
 </head>
 <body>
-    <h1>메뉴 관리 시스템</h1>
-    <!-- 메뉴 추가 버튼 -->
-    <button onclick="showAddMenuForm()">메뉴 추가</button>
+    <h1 id="server">메뉴 관리 시스템</h1>
+    <div id="server-list">
+        <!-- 메뉴 추가 버튼 -->
+        <button onclick="showAddMenuForm()">메뉴 추가</button>
+        <button onclick="toggleAllSoldOut()">전체 메뉴 품절 및 품절취소</button>
+    </div>
     <!-- 메뉴 목록 표시 -->
     <div id="menu-list">
         <table id="menu-table">
@@ -33,6 +36,7 @@
                     </th>
                     <th>이미지</th>
                     <th>수정</th>
+                    <th>품절</th>
                     <th>삭제</th>
                 </tr>
             </thead>            
@@ -42,6 +46,17 @@
         </table>
     </div>
 
+    <div id="order-list">
+        <table id="order-table">
+            <thead>
+                <th>주문내역</th>
+            </thead>
+            <tbody>
+                <td>주문 내역이 들어올 자리입니다</td>
+                <!--주문 내역이 들어올 자리입니다-->
+            </tbody>
+        </table>
+    </div>
     <!-- 메뉴 추가 팝업 -->
     <div id="add-form" class="popup">
         <div id="add-popup-content">
@@ -132,6 +147,10 @@
                     <td>${item.price}원</td>
                     <td>${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100px; height:auto;">` : ''}</td>
                     <td><button onclick="prepareUpdateMenu(${item.id}, '${safeName}', ${item.price}, '${safeImage}', '${safeCategory}')">수정</button></td>
+                    <td>
+                        <input type="checkbox" ${item.soldOut ? 'checked' : ''} 
+                            onclick="toggleSoldOut(${item.id}, this.checked)">
+                    </td>
                     <td><button onclick="deleteMenu(${item.id})">삭제</button></td>
                 `;
                 menuContainer.appendChild(menuRow);
@@ -273,6 +292,41 @@
             })
             .catch(error => {
                 alert('메뉴 삭제 중 오류가 발생했습니다: ' + error);
+            });
+        }
+
+        // 전체 품절/품절 취소 버튼 클릭 시 동작
+        function toggleAllSoldOut() {
+            const checkboxes = document.querySelectorAll('#menu-table tbody input[type="checkbox"]');
+            const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+            checkboxes.forEach(checkbox => {
+                const menuId = checkbox.closest('tr').querySelector('td:first-child').textContent;
+                const newState = !allChecked; // 모든 체크박스가 체크 상태라면 품절 해제, 아니면 품절 처리
+                checkbox.checked = newState;
+
+                // 서버로 품절 상태 변경 요청
+                toggleSoldOut(menuId, newState);
+            });
+        }
+
+        // 품절 상태 변경
+        function toggleSoldOut(id, isSoldOut) {
+            fetch('http://localhost:8000/menu/soldout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, soldOut: isSoldOut })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    fetchMenu(); // 서버 데이터 기반으로 UI 새로 고침
+                } else {
+                    alert('품절 상태 변경에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                alert('오류 발생: ' + error);
             });
         }
 

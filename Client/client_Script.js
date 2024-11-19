@@ -23,7 +23,7 @@ function displayMenu(menuData) {
             <h3>${item.name}</h3>
             <img src="http://localhost:8000/${item.image}" alt="${item.name}">
             <p>${item.price}원</p>
-            <button onclick="showAddItemPopup(${item.id})">담기</button>
+            <button ${item.soldOut ? 'disabled' : ''} onclick="showAddItemPopup(${item.id})">담기</button>
         `;
         menuListContainer.appendChild(menuCard);
     });
@@ -190,4 +190,7 @@ window.onload = function() {
     }
 
     updateCart();  // 페이지 로드 시 장바구니 상태 갱신
+
+    // 3초마다 메뉴 데이터를 갱신
+    setInterval(getMenuData, 3000);
 };
