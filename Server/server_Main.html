@@ -295,6 +295,29 @@
             });
         }
 
+        function fetchOrders() {
+            fetch('http://localhost:8000/orders')
+                .then((response) => response.json())
+                .then((orders) => {
+                    const ordersContainer = document.getElementById('order-table').getElementsByTagName('tbody')[0];
+                    ordersContainer.innerHTML = '';
+
+                    orders.forEach((order) => {
+                        const orderElement = document.createElement('tr');
+                        orderElement.innerHTML = `
+                            <td>${order.cart[0].name} 외 ${order.cart.length - 1}개
+                            <button onclick="completeOrder(${order.id})">처리완료</button></td>
+                        `;
+                        ordersContainer.appendChild(orderElement);
+                    });
+                });
+        }
+
+        function completeOrder(orderId) {
+            console.log(`Order ${orderId} 처리 완료`);
+            // 서버에 업데이트 요청 로직 추가 가능
+        }
+
         // 전체 품절/품절 취소 버튼 클릭 시 동작
         function toggleAllSoldOut() {
             const checkboxes = document.querySelectorAll('#menu-table tbody input[type="checkbox"]');

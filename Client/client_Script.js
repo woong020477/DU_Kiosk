@@ -180,6 +180,44 @@ function closeCartPopup() {
     }
 }
 
+// 결제하기 버튼 클릭 시 발생되는 함수
+function CheckOut(){
+    document.getElementById('payButton').addEventListener('click', async () => {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        if (cart.length === 0) {
+            alert('장바구니가 비어 있습니다.');
+            return;
+        }
+
+        try {
+            // 서버로 POST 요청
+            const response = await fetch('http://localhost:8000/processOrder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cart }), // cart 내용을 JSON으로 전송
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || '서버 오류가 발생했습니다.');
+            }
+
+            // 요청 성공 시 로컬 스토리지 초기화 및 성공 메시지 출력
+            localStorage.removeItem('cart');
+            document.getElementById('cart-items').innerHTML = ''; // 장바구니 UI 초기화
+            alert('결제가 완료되었습니다.');
+            showCart();  // 장바구니 보기 갱신
+            updateCart();  // 장바구니 갱신
+        } catch (error) {
+            console.error(error);
+            alert(`결제 처리 중 오류가 발생했습니다: ${error.message}`);
+        }
+    });    
+}
+
 // 페이지가 로드될 때 메뉴 데이터를 가져오고 장바구니 상태를 갱신
 window.onload = function() {
     const storedMenuData = localStorage.getItem('menuData');

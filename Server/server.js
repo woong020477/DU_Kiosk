@@ -57,24 +57,58 @@ app.get('/menu', (req, res) => {
 
 // POST: 메뉴 추가
 app.post('/menu', upload.single('image'), (req, res) => {
-    const { name, price, category } = req.body;
-    const image = req.file ? req.file.path : 'uploads/default_image.png';
+    try {
+        const { name, price, category } = req.body;
+        if (!name || !price || !category) {
+            throw new Error('필수 필드(name, price, category)가 누락되었습니다.');
+        }
 
-    const menuList = getMenuData();
-    const newMenuItem = {
-        id: menuList.length + 1,
-        name,
-        price,
-        category,
-        image,
-        soldOut: false, // 초기 품절 상태는 false
+        const image = req.file ? req.file.path : 'uploads/default_image.png';
+        const menuList = getMenuData();
+        const newMenuItem = {
+            id: menuList.length + 1,
+            name,
+            price,
+            category,
+            image,
+            soldOut: false,
+        };
+
+        menuList.push(newMenuItem);
+        saveMenuData(menuList);
+
+        res.json(newMenuItem);
+        console.log(`메뉴가 추가되었습니다.`);
+    } catch (error) {
+        console.error(error.message);
+        res.status(400).json({ status: 'error', message: error.message });
+    }
+});
+
+let orders = [];
+
+app.post('/processOrder', (req, res) => {
+    console.log('수신된 데이터:', req.body);
+    const { cart } = req.body;
+
+    if (!cart || cart.length === 0) {
+        return res.status(400).json({ success: false, message: '장바구니가 비어 있습니다.' })
+    }
+
+    // 주문 내역 저장
+    const newOrder = {
+        id: orders.length + 1,
+        cart,
+        status: '처리 대기 중',
     };
+    orders.push(newOrder);
 
-    menuList.push(newMenuItem);
-    saveMenuData(menuList);
+    res.json({ success: true });
+});
 
-    res.json(newMenuItem);
-    console.log(`메뉴가 추가되었습니다.`);
+// 주문 내역 확인을 위한 엔드포인트
+app.get('/orders', (req, res) => {
+    res.json(orders);
 });
 
 // POST: 품절 상태 변경
