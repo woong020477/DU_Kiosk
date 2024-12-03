@@ -209,6 +209,7 @@ function CheckOut(){
             localStorage.removeItem('cart');
             document.getElementById('cart-items').innerHTML = ''; // 장바구니 UI 초기화
             alert('결제가 완료되었습니다.');
+            closeCartPopup()
             showCart();  // 장바구니 보기 갱신
             updateCart();  // 장바구니 갱신
         } catch (error) {

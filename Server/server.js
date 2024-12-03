@@ -86,7 +86,7 @@ app.post('/menu', upload.single('image'), (req, res) => {
 });
 
 let orders = [];
-
+// 주문 내역 처리
 app.post('/processOrder', (req, res) => {
     console.log('수신된 데이터:', req.body);
     const { cart } = req.body;
@@ -109,6 +109,28 @@ app.post('/processOrder', (req, res) => {
 // 주문 내역 확인을 위한 엔드포인트
 app.get('/orders', (req, res) => {
     res.json(orders);
+});
+
+// DELETE: 주문 삭제
+app.delete('/orders', (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ success: false, message: '주문 ID가 제공되지 않았습니다.' });
+    }
+
+    const orderIndex = orders.findIndex((order) => order.id === parseInt(id));
+    if (orderIndex === -1) {
+        return res.status(404).json({ success: false, message: '주문을 찾을 수 없습니다.' });
+    }
+
+    // 해당 주문 삭제
+    orders.splice(orderIndex, 1);
+
+    // ID를 다시 정렬
+    orders = orders.map((order, index) => ({ ...order, id: index + 1 }));
+
+    res.json({ success: true, message: `주문 ${id}이 삭제되었습니다.` });
 });
 
 // POST: 품절 상태 변경
