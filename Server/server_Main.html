@@ -319,7 +319,7 @@
                                 ${order.cart.length === 1 ? order.cart[0].name : `${order.cart[0].name} 외 ${order.cart.length - 1}개`}<br>
                                 결제 금액 : ${totalPrice}원<br>
                                 <button onclick="showDetails(${order.id})">상세내역</button>
-                                <button onclick="deleteCart(${order.id})">장바구니삭제</button>
+                                <button onclick="deleteCart(${order.id})">취소</button>
                                 <button onclick="completeOrder(${order.id})">처리완료</button>
                             </td>
                         `;
@@ -431,10 +431,10 @@
                         alert(data.message); // 성공 메시지 출력
                         fetchOrders(); // 테이블 갱신
                     } else {
-                        alert(`장바구니 삭제 실패: ${data.message}`);
+                        alert(`취소 & 삭제 실패: ${data.message}`);
                     }
                 })
-                .catch((error) => console.error('장바구니 삭제 중 오류:', error));
+                .catch((error) => console.error('취소 & 삭제 중 오류:', error));
         }
 
         // 전체 품절/품절 취소 버튼 클릭 시 동작
