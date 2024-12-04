@@ -1,6 +1,0 @@
-# node_modules 폴더를 예외 처리
-Server/node_modules/
-
-# node.js 관련 파일들 예외 처리
-Server/package.json
-Server/package-lock.json
