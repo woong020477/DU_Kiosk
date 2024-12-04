@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="client_Design.css">
 </head>
 <body>
-    <h1>복지관 학식 키오스크</h1>
+    <h1 id="Header">복지관 학식 키오스크</h1>
 
     <!-- 카테고리 필터 -->
     <div id="category-filter">
@@ -16,6 +16,7 @@
         <button onclick="filterMenu('양식')">양식</button>
         <button onclick="filterMenu('분식')">분식</button>
         <button onclick="filterMenu('Special')">Special</button>
+        <button id="payListButton" onclick="payList(); openPayListModal();">결제내역 보기</button>
     </div>
 
     <!-- 메뉴 목록 -->
@@ -49,12 +50,23 @@
                 곱빼기:
                 <input type="checkbox" id="extra" />
             </label><br>
+            <br>
             <label>
                 빼주세요:
                 <input type="text" id="remove-text" />
             </label><br>
             <button onclick="addToCart()">담기</button>
             <button onclick="closeAddItemPopup()">취소</button>
+        </div>
+    </div>
+
+    <!-- 결제 내역 팝업 -->
+    <div id="payListModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closePayListModal()">&times;</span>
+            <div id="payListContainer">
+                <!-- 결제 내역이 여기에 표시됩니다 -->
+            </div>
         </div>
     </div>
 

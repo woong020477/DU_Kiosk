@@ -3,10 +3,10 @@
     "id": 1,
     "name": "된장찌개",
     "price": "5000",
-    "image": "uploads/default_image.png",
+    "image": "uploads/doenjangjjigae.png",
     "category": "한식",
     "soldOut": false,
-    "originalImage": "uploads/default_image.png"
+    "originalImage": "uploads/doenjangjjigae.png"
   },
   {
     "id": 2,
@@ -22,9 +22,9 @@
     "name": "김치찌개",
     "price": "6500",
     "category": "한식",
-    "image": "uploads/default_image.png",
+    "image": "uploads/kimchijjigae.png",
     "soldOut": false,
-    "originalImage": "uploads/default_image.png"
+    "originalImage": "uploads/kimchijjigae.png"
   },
   {
     "id": 4,

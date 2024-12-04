@@ -58,7 +58,7 @@ button {
   color: rgba(0, 0, 0, 0.808); /* 텍스트 색 */
   padding: 10px 20px;
   margin: 10px;
-  border: none;
+  border: 1px solid #000;
   border-radius: 5px; /* 버튼 모서리 둥글게 */
   cursor: pointer;
   font-size: 16px;
@@ -142,7 +142,7 @@ button:hover {
 #menu-table td button {
   background-color: #f8b400;  /* 버튼 배경 색상 */
   color: rgba(0, 0, 0, 0.808); /* 텍스트 색 */
-  border: none;
+  border: 1px solid #000;
   padding: 5px 10px;
   cursor: pointer;
 }

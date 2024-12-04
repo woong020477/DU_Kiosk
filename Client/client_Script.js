@@ -4,7 +4,16 @@ function getMenuData() {
         .then(response => response.json())
         .then(data => {
             localStorage.setItem('menuData', JSON.stringify(data)); // 메뉴 데이터를 로컬 스토리지에 저장
-            displayMenu(data);  // 화면에 메뉴 데이터를 표시
+
+            // 필터링 상태 가져오기
+            const currentCategory = localStorage.getItem('currentCategory');
+            if (currentCategory) {
+                // 저장된 필터 상태로 데이터 필터링
+                filterMenu(currentCategory, data);
+            } else {
+                // 필터 상태가 없으면 전체 메뉴 표시
+                displayMenu(data);
+            }
         })
         .catch(error => {
             console.error('메뉴 데이터를 가져오는 데 오류가 발생했습니다:', error);
@@ -30,16 +39,18 @@ function displayMenu(menuData) {
 }
 
 // 메뉴 필터링 함수
-function filterMenu(category) {
-    const storedMenuData = localStorage.getItem('menuData');
+function filterMenu(category, menuData = null) {
+    const storedMenuData = menuData || JSON.parse(localStorage.getItem('menuData'));
     if (!storedMenuData) {
         console.error('메뉴 데이터가 로컬 스토리지에 없습니다.');
         return;
     }
 
-    const menuData = JSON.parse(storedMenuData);
-    let filteredData = category === '전체' ? menuData : menuData.filter(item => item.category === category);
-    displayMenu(filteredData);  // 필터링된 메뉴 데이터를 화면에 표시
+    const filteredData = category === '전체' ? storedMenuData : storedMenuData.filter(item => item.category === category);
+    displayMenu(filteredData);
+
+    // 현재 필터 상태 저장
+    localStorage.setItem('currentCategory', category);
 }
 
 // 담기 버튼 클릭 시 호출되는 함수
@@ -149,7 +160,7 @@ function showCart() {
             <p>메뉴: ${item.name}</p>
             <span>가격: ${item.price}원</span>
             <span>곱빼기: ${item.size ? '예' : '아니오'}</span>
-            <p>빼주세요: ${item.notes}</p>
+            <p>요청사항: ${item.notes}</p>
             <button onclick="removeFromCart(${item.id})">삭제</button>
         `;
         cartListContainer.appendChild(cartItem);
@@ -181,49 +192,153 @@ function closeCartPopup() {
 }
 
 // 결제하기 버튼 클릭 시 발생되는 함수
-function CheckOut(){
-    document.getElementById('payButton').addEventListener('click', async () => {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+async function CheckOut() {
+    const payButton = document.getElementById('payButton');
+    if (!payButton) return;
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-        if (cart.length === 0) {
-            alert('장바구니가 비어 있습니다.');
-            return;
+    if (cart.length === 0) {
+        alert('장바구니가 비어 있습니다.');
+        return;
+    }
+
+    try {
+        // 서버로 POST 요청
+        const response = await fetch('http://localhost:8000/processOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cart }), // cart 내용을 JSON으로 전송
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || '서버 오류가 발생했습니다.');
         }
 
-        try {
-            // 서버로 POST 요청
-            const response = await fetch('http://localhost:8000/processOrder', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ cart }), // cart 내용을 JSON으로 전송
-            });
+        // 결제 완료 후 payComList 업데이트
+        updatePayComList(cart);
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || '서버 오류가 발생했습니다.');
-            }
-
-            // 요청 성공 시 로컬 스토리지 초기화 및 성공 메시지 출력
-            localStorage.removeItem('cart');
-            document.getElementById('cart-items').innerHTML = ''; // 장바구니 UI 초기화
-            alert('결제가 완료되었습니다.');
-            closeCartPopup()
-            showCart();  // 장바구니 보기 갱신
-            updateCart();  // 장바구니 갱신
-        } catch (error) {
-            console.error(error);
-            alert(`결제 처리 중 오류가 발생했습니다: ${error.message}`);
-        }
-    });    
+        // 요청 성공 시 로컬 스토리지 초기화 및 성공 메시지 출력
+        localStorage.removeItem('cart');
+        document.getElementById('cart-items').innerHTML = ''; // 장바구니 UI 초기화
+        alert('결제가 완료되었습니다.');
+        closeCartPopup();
+        showCart();  // 장바구니 보기 갱신
+        updateCart();  // 장바구니 갱신
+    } catch (error) {
+        console.error(error);
+        alert(`결제 처리 중 오류가 발생했습니다: ${error.message}`);
+    }
 }
 
-// 페이지가 로드될 때 메뉴 데이터를 가져오고 장바구니 상태를 갱신
+// payComList에 결제 내역 추가하는 함수
+function updatePayComList(cart) {
+    // 현재 날짜와 시간 가져오기
+    const currentDate = new Date().toISOString();
+
+    // 필요한 키만 남기고 나머지는 제거
+    const filteredCart = cart.map(item => {
+        return {
+            name: item.name,
+            price: item.price,
+            size: item.size,
+            notes: item.notes
+        };
+    });
+
+    // 로컬 스토리지에서 기존 payComList 가져오기
+    const payComList = JSON.parse(localStorage.getItem('payComList')) || [];
+
+    // 새로운 주문 내역 추가
+    const newPayEntry = {
+        date: currentDate,
+        orderDetails: filteredCart
+    };
+    payComList.push(newPayEntry);
+
+    // 업데이트된 payComList를 로컬 스토리지에 저장
+    localStorage.setItem('payComList', JSON.stringify(payComList));
+    console.log('payComList 업데이트:', newPayEntry);
+}
+
+// payComList를 초기화하는 함수
+function clearPayComList() {
+    if (confirm('결제 내역을 초기화하시겠습니까?')) {
+        localStorage.removeItem('payComList');
+        const payListContainer = document.getElementById('payListContainer');
+        payListContainer.innerHTML = '<p>결제 내역이 없습니다.</p>';
+        refreshPayComList();
+        alert('결제 내역이 초기화되었습니다.');
+    }
+}
+
+// 결제 내역 보기
+function payList() {
+    const payListContainer = document.getElementById('payListContainer');
+    const payComList = JSON.parse(localStorage.getItem('payComList')) || [];
+
+    // PayComList가 비어있을 경우 처리
+    if (payComList.length === 0) {
+        payListContainer.innerHTML = '<p>결제 내역이 없습니다.</p>';
+        return;
+    }
+
+    // 결제 내역 HTML 생성
+    payListContainer.innerHTML = payComList.map(entry => `
+            <div class="pay-entry">
+                <p>결제시간: ${entry.date}</p>
+                ${entry.orderDetails.map(item => `
+                    <div class="pay-item">
+                        <p>메뉴: ${item.name}</p>
+                        <span>가격: ${item.price}원</span>
+                        <span>곱빼기: ${item.size ? '예' : '아니오'}</span>
+                        <p>요청사항: ${item.notes || '없음'}</p>
+                    </div>
+                `).join('')}
+            </div>
+        `).join('') +
+        '<button onclick="clearPayComList()">결제 내역 초기화</button>';
+}
+
+// 모달 열기
+function openPayListModal() {
+    const modal = document.getElementById('payListModal');
+    modal.style.display = 'block';
+}
+
+// 모달 닫기
+function closePayListModal() {
+    const modal = document.getElementById('payListModal');
+    modal.style.display = 'none';
+}
+
+function refreshPayComList() {
+    // 로컬 스토리지에서 기존 PayComList 가져오기
+    const payComList = JSON.parse(localStorage.getItem('payComList')) || [];
+
+    // PayComList 상태 갱신: 기존 데이터를 특정 규칙에 따라 업데이트
+    const updatedPayComList = payComList.map(item => ({
+        ...item,
+        updated: true, // 예시로 "updated" 속성을 추가
+    }));
+
+    // 로컬 스토리지에 갱신된 리스트 저장
+    localStorage.setItem('payComList', JSON.stringify(updatedPayComList));
+}
+
+// 페이지 로드 시 메뉴 데이터를 가져오고 장바구니 상태를 갱신
 window.onload = function() {
     const storedMenuData = localStorage.getItem('menuData');
     if (storedMenuData) {
-        displayMenu(JSON.parse(storedMenuData));  // 로컬 스토리지에 있는 데이터 사용
+        // 필터 상태 확인
+        const currentCategory = localStorage.getItem('currentCategory');
+        if (currentCategory) {
+            filterMenu(currentCategory);  // 현재 필터 상태로 메뉴 표시
+        } else {
+            displayMenu(JSON.parse(storedMenuData));  // 전체 메뉴 표시
+        }
     } else {
         getMenuData();  // 서버에서 메뉴 데이터를 불러옴
     }
@@ -232,4 +347,5 @@ window.onload = function() {
 
     // 3초마다 메뉴 데이터를 갱신
     setInterval(getMenuData, 3000);
+    setInterval(refreshPayComList, 3000);
 };

@@ -1,15 +1,57 @@
 /* 기본 설정 */
+#Header {
+    border: 1px solid #000;
+    padding: 20px;
+    margin-bottom: 10px;
+    border-radius: 10px; /* 모서리 둥글게 */
+    background-color: #8ccadd; /* 배경 색 */
+    text-align: center; /* 전체 텍스트 중앙 정렬 */
+}
+
 body {
     font-family: Arial, sans-serif;
     padding: 20px;
 }
-
+#category-filter {
+    border: 1px solid #000;
+    padding: 15px;
+    margin-bottom: 5px;
+    border-radius: 10px; /* 모서리 둥글게 */
+    background-color: #94c29e; /* 배경 색 */
+    text-align: center; /* 전체 텍스트 중앙 정렬 */
+}
 /* 카테고리 필터 버튼 */
 #category-filter button {
-    margin-right: 10px;
-    padding: 10px;
+    background-color: #8bd973;
+    border: 1px solid #000;
+    color: rgba(0, 0, 0, 0.808); /* 텍스트 색 */
+    padding: 10px 4%;
+    margin: 2px;
+    border-radius: 5px; /* 버튼 모서리 둥글게 */
+    cursor: pointer;
+    font-size: 16px;
+}
+  
+#category-filter button:hover {
+    border: 1px solid #000;
+    background-color: #79c961; /* 버튼 hover 시 색상 변경 */
 }
 
+button {
+    background-color: #d2dce9;
+    border: 1px solid #000;
+    color: rgba(0, 0, 0, 0.808); /* 텍스트 색 */
+    padding: 1px 8%;
+    margin: 2px;
+    border-radius: 5px; /* 버튼 모서리 둥글게 */
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    border: 1px solid #000;
+    background-color: #adc4e2; /* 버튼 hover 시 색상 변경 */
+}
 /* 메뉴 목록 레이아웃 */
 .menu-list {
     display: flex;
@@ -22,13 +64,13 @@ body {
 .menu-card {
     border: 1px solid #ddd;
     border-radius: 10px;
-    width: calc(25% - 20px);
+    width: calc(24% - 20px);
     padding: 10px;
     text-align: center;
 }
 
 .menu-card img {
-    width: 50%;
+    width: 40%;
     border-radius: 10px;
 }
 
@@ -40,6 +82,7 @@ body {
     background-color: #fff;
     padding: 10px;
     border-radius: 10px;
+    border: 1px solid #000;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -63,9 +106,10 @@ body {
     border-radius: 10px;
     width: 400px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 */
+    text-align: center;
 }
 
-/* 팝업 닫기 버튼 스타일 */
+/* 팝업 내부 버튼 스타일 */
 .popup-content button {
     padding: 10px;
     margin-top: 10px;
@@ -159,4 +203,55 @@ body {
 
 .close-popup:hover {
     background-color: #d32f2f;
+}
+
+/* 모달 기본 스타일 */
+.modal {
+    display: none; /* 초기에는 숨김 */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* 모달 콘텐츠 스타일 */
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #000000;
+    width: 80%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 닫기 버튼 스타일 */
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #000;
+    text-decoration: none;
+}
+.pay-entry{
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ff0000;
+    border-radius: 5px;
+}
+.pay-item{
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
