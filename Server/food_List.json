@@ -12,10 +12,10 @@
     "id": 2,
     "name": "돈까스",
     "price": "5000",
-    "image": "uploads/default_image.png",
+    "image": "uploads/porkcutlet.png",
     "category": "양식",
     "soldOut": false,
-    "originalImage": "uploads/default_image.png"
+    "originalImage": "uploads/porkcutlet.png"
   },
   {
     "id": 3,

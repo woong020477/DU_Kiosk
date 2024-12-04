@@ -17,7 +17,9 @@
   "pkg": {
     "scripts": "server.js",
     "assets": [
-      "uploads/**/*"
+      "uploads/**/*",
+      "order-log.txt",
+      "food_List.json"
     ]
   },
   "description": ""

@@ -48,7 +48,7 @@ const upload = multer({
 });
 
 // 주문 로그 파일 경로
-const logFilePath = path.join(__dirname, 'order-log.txt');
+const logFilePath = path.resolve(process.cwd(), 'order-log.txt');
 
 // 주문 내역을 기록하는 함수
 const logOrder = (order, status) => {
@@ -96,7 +96,7 @@ app.post('/logOrder', (req, res) => {
 });
 
 // 메뉴 데이터를 보관하는 JSON 파일 경로
-const filePath = 'food_List.json';
+const filePath = path.resolve(process.cwd(), 'food_List.json');
 
 // 메뉴 데이터를 읽어오는 함수
 const getMenuData = () => {

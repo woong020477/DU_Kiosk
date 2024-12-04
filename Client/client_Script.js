@@ -30,7 +30,7 @@ function displayMenu(menuData) {
         menuCard.classList.add('menu-card');
         menuCard.innerHTML = `
             <h3>${item.name}</h3>
-            <img src="http://localhost:8000/${item.image}" alt="${item.name}">
+            <img src="http://localhost:8000/${item.image}" alt="${item.name}" width="200px" height="100px">
             <p>${item.price}원</p>
             <button ${item.soldOut ? 'disabled' : ''} onclick="showAddItemPopup(${item.id})">담기</button>
         `;
