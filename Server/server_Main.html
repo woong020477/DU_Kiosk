@@ -57,10 +57,12 @@
         </table>
     </div>
     <!-- 팝업 창 -->
-    <div id="order-popup" style="">
-        <h3>상세 내역</h3>
-        <ul id="popupDetails"></ul>
-        <button onclick="closePopup()">닫기</button>
+    <div id="order-form" class="popup">
+        <div id="order-popup">
+            <h3>상세 내역</h3><br>
+            <ul id="popupDetails"></ul><br>
+            <button onclick="closePopup()">닫기</button>
+        </div>
     </div>
     <!-- 메뉴 추가 팝업 -->
     <div id="add-form" class="popup">
@@ -311,7 +313,8 @@
                         const orderElement = document.createElement('tr');
                         orderElement.innerHTML = `
                             <td>
-                                주문번호 : ${order.id} ${order.cart[0].name}외 ${order.cart.length - 1}개
+                                주문번호 : ${order.id}<br>
+                                ${order.cart[0].name}외 ${order.cart.length - 1}개<br>
                                 <button onclick="showDetails(${order.id})">상세내역</button>
                                 <button onclick="deleteCart(${order.id})">장바구니삭제</button>
                                 <button onclick="completeOrder(${order.id})">처리완료</button>
@@ -324,23 +327,39 @@
 
         // 팝업 열기: 상세 내역 표시
         function showDetails(orderId) {
-            const order = orders.find((o) => o.id === orderId);
+            fetch('http://localhost:8000/orders')
+                .then((response) => response.json())
+                .then((orders) => {
+                    const order = orders.find((o) => o.id === orderId);
+                    if (order) {
+                        showOrderForm();
+                        order.cart.forEach((item) => {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `${item.name} - ${item.price}원<br>
+                            곱빼기 ${item.size}<br>
+                            요청사항 : ${item.notes}<br>
+                            <br>`;
+                            popupDetails.appendChild(listItem);
+                        });
+                    }
+                    else if (!order) {
+                        console.error('Order not found!');
+                        return;
+                    }
+                    console.log('Order details:', order);
+                })
+                .catch((error) => {
+                    console.error('Error fetching order details:', error);
+                });
             const popupDetails = document.getElementById('popupDetails');
             popupDetails.innerHTML = '';
-
-            if (order) {
-                order.cart.forEach((item) => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `${item.name} - ${item.price}원`;
-                    popupDetails.appendChild(listItem);
-                });
-            }
 
             document.getElementById('order-popup').style.display = 'flex';
         }
 
         // 팝업 닫기
         function closePopup() {
+            closeOrderForm();
             document.getElementById('order-popup').style.display = 'none';
         }
 
@@ -423,6 +442,16 @@
         // 메뉴 수정 폼을 숨기기
         function closeUpdateMenuForm() {
             document.getElementById('update-form').style.display = 'none';  // 수정 폼을 숨기기
+        }
+
+        // 메뉴 수정 폼을 표시
+        function showOrderForm() {
+            document.getElementById('order-form').style.display = 'flex';  // 수정 폼을 표시
+        }
+
+        // 메뉴 수정 폼을 숨기기
+        function closeOrderForm() {
+            document.getElementById('order-form').style.display = 'none';  // 수정 폼을 숨기기
         }
 
         // 페이지 로드 시 메뉴 목록 가져오기
